@@ -1,1 +1,1 @@
-# akash-deploy-app
+# akash-deploy-ui
