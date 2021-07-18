@@ -16,7 +16,7 @@ import DeployStepper from './DeployStepper';
 import { SDL, loadPEMBlocks } from 'akashjs';
 import { useAccount } from '../utils/AccountContext';
 
-export const DeploySDL = () => {
+export const DeploySDL = (props: any) => {
   const account = useAccount();
   let sdl = SAMPLE_SDL;
 
@@ -91,6 +91,7 @@ export const DeploySDL = () => {
               sdl={new SDL(sdl)}
               handleDialogClose={handleClose}
               handleSetDismissable={setDismissable}
+              updateBalance={props.updateBalance}
             ></DeployStepper>
           </DialogContentText>
         </DialogContent>

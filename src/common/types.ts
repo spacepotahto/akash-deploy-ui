@@ -9,7 +9,6 @@ declare global {
 export interface Account {
   address: string,
   name?: string,
-  balance?: number,
   akash?: Akash
 }
 

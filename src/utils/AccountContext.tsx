@@ -3,14 +3,14 @@ import { Akash } from 'akashjs';
 import { CHAIN_ID, RPC } from '../common/constants';
 import { Account, AccountUpdate } from '../common/types';
 
-const AccountContext = React.createContext<Account>({ address: '', name: '', balance: 0 });
+const AccountContext = React.createContext<Account>({ address: '', name: '' });
 const AccountUpdateContext = React.createContext<AccountUpdate>(() => {});
 
 const useAccount = () => useContext(AccountContext);
 const useAccountUpdate = () => useContext(AccountUpdateContext);
 
 const AccountProvider = ({ children }: React.PropsWithChildren<{}>) => {
-  const [account, setAccount] = useState<Account>({ address: '', name: '', balance: 0 });
+  const [account, setAccount] = useState<Account>({ address: '', name: ''});
   
   const changeAccount = (account: Account) => {
     setAccount(account);
@@ -29,8 +29,7 @@ const AccountProvider = ({ children }: React.PropsWithChildren<{}>) => {
       const akash = await Akash.connect(RPC, offlineSigner);
       const accounts = await offlineSigner.getAccounts();
       const address = accounts[0].address;
-      const balance = await akash.query.bank.balance(address, 'uakt');
-      setAccount({ address: address, name: key.name, balance: Number(balance.amount), akash: akash });
+      setAccount({ address: address, name: key.name, akash: akash });
     }
     setupAccount();
 

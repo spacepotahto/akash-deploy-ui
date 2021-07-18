@@ -56,6 +56,7 @@ export const ManageCertificate = (props: any) => {
     await getCertificate();
     setBusy(false);
     console.log(response);
+    props.updateBalance();
     return response;
   };
 
@@ -70,6 +71,7 @@ export const ManageCertificate = (props: any) => {
     await getCertificate();
     setBusy(false);
     console.log(response);
+    props.updateBalance();
     return response;
   };
 

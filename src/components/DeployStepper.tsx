@@ -113,6 +113,7 @@ export default function DeployStepper(props: any) {
     // console.log(queryMarketOrderResult);
     // console.log("");
     console.log(dseq, gseq, oseq);
+    props.updateBalance();
 
     await wait(5);
 
@@ -149,6 +150,7 @@ export default function DeployStepper(props: any) {
     });
     console.log(marketLeaseCreate);
     console.log("");
+    props.updateBalance();
 
     await wait(1);
     console.log("Confirm the Lease");

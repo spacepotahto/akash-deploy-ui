@@ -4,7 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import AccountBalanceWalletIcon from '@material-ui/icons/AccountBalanceWallet';
 import { useAccount } from '../utils/AccountContext';
 
-export const WalletDisplay = () => {
+export const WalletDisplay = (props: any) => {
   const account = useAccount();
 
   const formatBalance = (balance: number, places: number) => {
@@ -24,7 +24,7 @@ export const WalletDisplay = () => {
           <Typography variant="h6" noWrap>{account.name}</Typography>
         </Grid>
         <Grid item>
-          <Typography variant="subtitle1">{`${formatBalance(account.balance || 0, 2)} AKT`}</Typography>
+          <Typography variant="subtitle1">{`${formatBalance(props.balance || 0, 3)} AKT`}</Typography>
         </Grid>
       </Grid>
     </Grid>

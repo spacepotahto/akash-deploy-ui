@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Box from '@material-ui/core/Box';
@@ -49,6 +49,20 @@ export const App = () => {
   const account = useAccount();
   const akash = account.akash;
 
+  const [balance, setBalance] = useState(0);
+
+  const updateBalance = async () => {
+    if (!akash) {
+      return;
+    }
+    const b = await akash.query.bank.balance(account.address, 'uakt');
+    setBalance(Number(b.amount));
+  };
+
+  useEffect(() => {
+    updateBalance();
+  }, [account]);
+
   const tabClasses = useTabStyles();
   const [value, setValue] = React.useState('1');
   const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
@@ -81,7 +95,7 @@ export const App = () => {
                     </TabList>
                   </Box>
                   <Box width={200}>
-                    <WalletDisplay />
+                    <WalletDisplay balance={balance}/>
                   </Box>
                 </Toolbar>
                 </Box>
@@ -92,17 +106,17 @@ export const App = () => {
           <Container maxWidth="md">
             <TabPanel value="1">
               <Box className={tabClasses.tabpanel}>
-                <DeploySDL />
+                <DeploySDL updateBalance={updateBalance}/>
               </Box>
             </TabPanel>
             <TabPanel value="2">
               <Typography>TBA!</Typography>
             </TabPanel>
             <TabPanel value="3">
-              <DeploymentList />
+              <DeploymentList updateBalance={updateBalance}/>
             </TabPanel>
             <TabPanel className={tabClasses.tabpanel} value="4">
-              <ManageCertificate />
+              <ManageCertificate updateBalance={updateBalance}/>
             </TabPanel>
           </Container>
         </TabContext>

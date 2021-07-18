@@ -64,6 +64,7 @@ export const DeploymentList = (props: any) => {
       setCloseBusyDseq(-1);
     })
     console.log(response);
+    props.updateBalance();
     return response;
   };
 
