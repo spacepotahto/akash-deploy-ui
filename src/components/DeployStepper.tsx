@@ -226,13 +226,13 @@ export default function DeployStepper(props: any) {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
+  // const handleBack = () => {
+  //   setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  // };
 
-  const handleReset = () => {
-    setActiveStep(0);
-  };
+  // const handleReset = () => {
+  //   setActiveStep(0);
+  // };
 
   const getStepContent = (step: number, handleCloseDialog: any) => {
     switch (step) {
@@ -289,42 +289,7 @@ export default function DeployStepper(props: any) {
             }
             </StepLabel>
             <StepContent>
-              {/* {getStepContent(index, props.handleDialogClose)} */}
-              {
-              index === 0 && (
-                <React.Fragment>
-                  <Typography>
-                    {`Submit your deployment to the blockchain via Keplr. This generates an order on the Akash marketplace.`}
-                  </Typography>
-                  <Button
-                    onClick={props.handleDialogClose}
-                    color="secondary"
-                    className={classes.button}
-                  >
-                    Cancel
-                  </Button>
-                </React.Fragment>
-              )
-              }
-              {
-              index === 1 && (
-                <React.Fragment>
-                  <Typography>
-                    {'The following providers bid on your order. Choose one:'}
-                  </Typography>
-                  <BidsForm
-                    bidsList={bidsList}
-                    handleChooseProvider={(provider: string) => {
-                      handleNext();
-                      setWinProvider(provider);
-                    }}
-                  />
-                </React.Fragment>
-              )
-              }
-              {
-                index === 2 && `Create a lease for the bid from the chosen provider via Keplr. Once created, your deployment manifest will be submitted to the provider.`
-              }
+              {getStepContent(index, props.handleDialogClose)}
             </StepContent>
           </Step>
         ))}
@@ -333,7 +298,7 @@ export default function DeployStepper(props: any) {
         <Paper square elevation={0} className={classes.resetContainer}>
           <Typography>The provider has executed your workload! Your access details:</Typography>
           <div>
-            <pre>
+            <pre style={ { fontSize: "0.75rem" } }>
               {JSON.stringify(leaseStatusResult, null, 2)}
             </pre>
           </div>

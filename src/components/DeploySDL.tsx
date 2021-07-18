@@ -13,20 +13,29 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DeployStepper from './DeployStepper';
-import { SDL } from 'akashjs';
+import { SDL, loadPEMBlocks } from 'akashjs';
+import { useAccount } from '../utils/AccountContext';
 
 export const DeploySDL = () => {
+  const account = useAccount();
   let sdl = SAMPLE_SDL;
 
   const [open, setOpen] = React.useState(false);
+  const [alert, setAlert] = React.useState(false);
   const [dismissable, setDismissable] = React.useState(false);
 
-  const handleClickOpen = () => {
-    setOpen(true);
+  const handleClickOpen = async () => {
+    const cert = await loadPEMBlocks(account.address).catch((e) => console.log(e));
+    if (!cert) {
+      setAlert(true);
+    } else {
+      setOpen(true);
+    }
   };
 
   const handleClose = () => {
     setOpen(false);
+    setAlert(false);
   };
 
   useEffect(() => {
@@ -87,6 +96,18 @@ export const DeploySDL = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} variant="contained" color="secondary" disabled={!dismissable}>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={alert}>
+        <DialogContent>
+          <DialogContentText>
+            No valid certificate found. A valid certificate is required for deployments. Please go to "Certificate" tab to create one.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} variant="contained" color="secondary">
             Close
           </Button>
         </DialogActions>

@@ -15,8 +15,11 @@ import Tab from '@material-ui/core/Tab';
 import TabList from '@material-ui/lab/TabList';
 import TabPanel from '@material-ui/lab/TabPanel';
 import Typography from '@material-ui/core/Typography';
-import { CertificateCard } from './CertificateCard';
 import { DeploySDL } from './DeploySDL';
+import { ManageCertificate } from './ManageCertificate';
+import { DeploymentList } from './DeploymentList';
+import { useAccount } from '../utils/AccountContext';
+import LoadingBackdrop from './LoadingBackdrop';
 
 interface Props {
   children: React.ReactElement;
@@ -43,8 +46,8 @@ const useTabStyles = makeStyles({
 });
 
 export const App = () => {
-  // const account = useAccount();
-  // const akash = account.akash;
+  const account = useAccount();
+  const akash = account.akash;
 
   const tabClasses = useTabStyles();
   const [value, setValue] = React.useState('1');
@@ -87,21 +90,24 @@ export const App = () => {
           </ElevationScroll>
           <Toolbar />
           <Container maxWidth="md">
-            <TabPanel className={tabClasses.tabpanel} value="1">
-              <DeploySDL />
+            <TabPanel value="1">
+              <Box className={tabClasses.tabpanel}>
+                <DeploySDL />
+              </Box>
             </TabPanel>
             <TabPanel value="2">
               <Typography>TBA!</Typography>
             </TabPanel>
             <TabPanel value="3">
-              <Typography>TBA!</Typography>
+              <DeploymentList />
             </TabPanel>
             <TabPanel className={tabClasses.tabpanel} value="4">
-              <CertificateCard />
+              <ManageCertificate />
             </TabPanel>
           </Container>
         </TabContext>
       </Box>
+      <LoadingBackdrop open={account.address === ''} />
     </React.Fragment>
   );
 }
