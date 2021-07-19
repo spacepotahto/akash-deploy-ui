@@ -71,6 +71,8 @@ export default function DeployStepper(props: any) {
   const [bidsList, setBidsList] = React.useState([]);
   const [winProvider, setWinProvider] = React.useState('');
   const [leaseStatusResult, setLeaseStatusResult] = React.useState<any>({});
+  const [cancelDisabled, setCancelDisabled] = React.useState(true);
+  const [progressText, setProgressText] = React.useState('Awaiting "create deployment" transaction...');
 
   const steps = getSteps();
 
@@ -85,36 +87,20 @@ export default function DeployStepper(props: any) {
     }
     console.log("Create a Deployment (tx deployment create)");
     const sdl = props.sdl;
-    const createDeploymentResult = await akash.tx.deployment.create.params({
+    const createDeploymentPromise = akash.tx.deployment.create.params({
       sdl: sdl
     });
+    createDeploymentPromise.catch((e) => setCancelDisabled(false))
+    const createDeploymentResult = await createDeploymentPromise;
     console.log(createDeploymentResult);
     const {
       dseq, gseq, oseq
     } = findDeploymentSequence(createDeploymentResult);
 
-    // await wait(2);
-    // console.log("Verify Deployment is Open");
-    // const queryDeploymentResult = await akash.query.deployment.get.params({
-    //   owner: account.address,
-    //   dseq: dseq
-    // });
-    // console.log(queryDeploymentResult);
-    // console.log("");
-
-    // await wait(2);
-    // console.log("Verify Order is Open");
-    // const queryMarketOrderResult = await akash.query.market.order.get.params({
-    //   owner: account.address,
-    //   dseq: dseq,
-    //   gseq: gseq,
-    //   oseq: oseq
-    // });
-    // console.log(queryMarketOrderResult);
-    // console.log("");
     console.log(dseq, gseq, oseq);
     props.updateBalance();
 
+    setProgressText("Waiting for bids...");
     await wait(5);
 
     let haveBids = false;
@@ -141,6 +127,8 @@ export default function DeployStepper(props: any) {
     const sdl = props.sdl;
     const { dseq, gseq, oseq } = createDeploymentResult;
     const provider = winProvider;
+
+    setProgressText('Awaiting "create lease" transaction...');
     console.log("Create a Lease");
     const marketLeaseCreate = await akash.tx.market.lease.create.params({
       dseq: dseq,
@@ -152,6 +140,7 @@ export default function DeployStepper(props: any) {
     console.log("");
     props.updateBalance();
 
+    setProgressText("Confirming the lease...");
     await wait(1);
     console.log("Confirm the Lease");
     const marketLeaseList = await akash.query.market.lease.list.params({
@@ -161,6 +150,7 @@ export default function DeployStepper(props: any) {
     console.log(marketLeaseList);
     console.log("");
 
+    setProgressText("Querying the provider...");
     await wait(1);
     console.log("Query Provider");
     const providerGet = await akash.query.provider.get.params({
@@ -169,6 +159,7 @@ export default function DeployStepper(props: any) {
     console.log(providerGet);
     console.log("");
 
+    setProgressText("Sending the manifest...");
     await wait(5);
 
     console.log("Send the Manifest");
@@ -182,6 +173,7 @@ export default function DeployStepper(props: any) {
     console.log("");
 
 
+    setProgressText("Querying lease status...");
     await wait(5);
 
     console.log("Provider Lease Status");
@@ -228,26 +220,22 @@ export default function DeployStepper(props: any) {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
-  // const handleBack = () => {
-  //   setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  // };
-
-  // const handleReset = () => {
-  //   setActiveStep(0);
-  // };
-
   const getStepContent = (step: number, handleCloseDialog: any) => {
     switch (step) {
       case 0:
         return (
           <React.Fragment>
-            <Typography>
+            <Typography gutterBottom>
               {`Submit your deployment to the blockchain via Keplr. This generates an order on the Akash marketplace.`}
+            </Typography>
+            <Typography variant="subtitle2" color="secondary">
+              {progressText}
             </Typography>
             <Button
               onClick={handleCloseDialog}
               color="secondary"
               className={classes.button}
+              disabled={cancelDisabled}
             >
               Cancel
             </Button>
@@ -256,7 +244,7 @@ export default function DeployStepper(props: any) {
       case 1:
         return (
           <React.Fragment>
-            <Typography>
+            <Typography gutterBottom>
               {'The following providers bid on your order. Choose one:'}
             </Typography>
             <BidsForm
@@ -269,7 +257,16 @@ export default function DeployStepper(props: any) {
           </React.Fragment>
         );
       case 2:
-        return `Create a lease for the bid from the chosen provider via Keplr. Once created, your deployment manifest will be submitted to the provider.`;
+        return (
+          <React.Fragment>
+            <Typography gutterBottom>
+              {`Create a lease for the bid from the chosen provider via Keplr. Once created, your deployment manifest will be submitted to the provider.`}
+            </Typography>
+            <Typography variant="subtitle2" color="secondary">
+              {progressText}
+            </Typography>
+          </React.Fragment>
+        )
       default:
         return 'Unknown step';
     }

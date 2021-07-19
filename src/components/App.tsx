@@ -20,6 +20,8 @@ import { ManageCertificate } from './ManageCertificate';
 import { DeploymentList } from './DeploymentList';
 import { useAccount } from '../utils/AccountContext';
 import LoadingBackdrop from './LoadingBackdrop';
+import { SDLGallery } from './SDLGallery';
+import { SAMPLE_SDL } from '../common/constants';
 
 interface Props {
   children: React.ReactElement;
@@ -50,6 +52,10 @@ export const App = () => {
   const akash = account.akash;
 
   const [balance, setBalance] = useState(0);
+  const [sdl, setSdl] = React.useState(
+    '# Sample SDL that describes a Lunie Wallet frontend deployment.\n' +
+    '# Deploy it as is, edit it, or replace with your own!\n\n' +
+    SAMPLE_SDL);
 
   const updateBalance = async () => {
     if (!akash) {
@@ -67,6 +73,14 @@ export const App = () => {
   const [value, setValue] = React.useState('1');
   const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
     setValue(newValue);
+  };
+
+  const goToDeployTab = () => {
+    setValue("1");
+  };
+
+  const setDeploySDL = (sdl: string) => {
+    setSdl(sdl);
   };
   
   return (
@@ -106,11 +120,11 @@ export const App = () => {
           <Container maxWidth="md">
             <TabPanel value="1">
               <Box className={tabClasses.tabpanel}>
-                <DeploySDL updateBalance={updateBalance}/>
+                <DeploySDL sdl={sdl} updateBalance={updateBalance}/>
               </Box>
             </TabPanel>
             <TabPanel value="2">
-              <Typography>TBA!</Typography>
+              <SDLGallery goToDeployTab={goToDeployTab} setDeploySDL={setDeploySDL}/>
             </TabPanel>
             <TabPanel value="3">
               <DeploymentList updateBalance={updateBalance}/>

@@ -4,7 +4,6 @@ import CodeMirror from '@uiw/react-codemirror';
 import 'codemirror/keymap/sublime';
 import 'codemirror/theme/monokai.css';
 import React, { useEffect } from 'react';
-import { SAMPLE_SDL } from '../common/constants';
 import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
 
@@ -18,11 +17,12 @@ import { useAccount } from '../utils/AccountContext';
 
 export const DeploySDL = (props: any) => {
   const account = useAccount();
-  let sdl = SAMPLE_SDL;
+  let sdl = props.sdl;
 
   const [open, setOpen] = React.useState(false);
   const [alert, setAlert] = React.useState(false);
   const [dismissable, setDismissable] = React.useState(false);
+  const [codeInstance, setCodeInstance] = React.useState<any>(null);
 
   const handleClickOpen = async () => {
     const cert = await loadPEMBlocks(account.address).catch((e) => console.log(e));
@@ -58,14 +58,14 @@ export const DeploySDL = (props: any) => {
       </Typography>
       </Box>
       <CodeMirror
-        value={SAMPLE_SDL}
-        onChange={(instance, change) => { sdl = instance.getValue(); }}
+        value={sdl}
+        onChange={(instance, change) => { setCodeInstance(instance) }}
         options={{
           theme: 'monokai',
           keyMap: 'sublime',
           mode: 'yml',
         }}
-        height={`calc(100vh - 250px)`}
+        height={`calc(100vh - 300px)`}
         width="100%"
       />
       <Box pt={2}>
@@ -88,7 +88,7 @@ export const DeploySDL = (props: any) => {
         <DialogContent>
           <DialogContentText id="deploy-dialog-stepper">
             <DeployStepper
-              sdl={new SDL(sdl)}
+              sdl={new SDL(codeInstance ? codeInstance.getValue() : sdl)}
               handleDialogClose={handleClose}
               handleSetDismissable={setDismissable}
               updateBalance={props.updateBalance}
