@@ -20,22 +20,36 @@ export const DeploySDL = (props: any) => {
   let sdl = props.sdl;
 
   const [open, setOpen] = React.useState(false);
-  const [alert, setAlert] = React.useState(false);
+  const [certAlert, setCertAlert] = React.useState(false);
+  const [sdlAlert, setSdlAlert] = React.useState(false);
   const [dismissable, setDismissable] = React.useState(false);
   const [codeInstance, setCodeInstance] = React.useState<any>(null);
 
   const handleClickOpen = async () => {
+    // Check for valid cert
     const cert = await loadPEMBlocks(account.address).catch((e) => console.log(e));
     if (!cert) {
-      setAlert(true);
-    } else {
-      setOpen(true);
+      setCertAlert(true);
+      return;
     }
+
+    // Check that SDL is valid
+    try {
+      const sdlVal = new SDL(codeInstance ? codeInstance.getValue() : sdl);
+    } catch (e) {
+      console.log(e);
+      setSdlAlert(true);
+      return;
+    }
+    
+    // Open deployment dialog
+    setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false);
-    setAlert(false);
+    setCertAlert(false);
+    setSdlAlert(false);
   };
 
   useEffect(() => {
@@ -88,7 +102,7 @@ export const DeploySDL = (props: any) => {
         <DialogContent>
           <DialogContentText id="deploy-dialog-stepper">
             <DeployStepper
-              sdl={new SDL(codeInstance ? codeInstance.getValue() : sdl)}
+              sdl={open && new SDL(codeInstance ? codeInstance.getValue() : sdl)}
               handleDialogClose={handleClose}
               handleSetDismissable={setDismissable}
               updateBalance={props.updateBalance}
@@ -101,10 +115,22 @@ export const DeploySDL = (props: any) => {
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog open={alert}>
+      <Dialog open={certAlert}>
         <DialogContent>
           <DialogContentText>
             No valid certificate found. A valid certificate is required for deployments. Please go to "Certificate" tab to create one.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} variant="contained" color="secondary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={sdlAlert}>
+        <DialogContent>
+          <DialogContentText>
+            Your SDL appears to be invalid. Please double check.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
